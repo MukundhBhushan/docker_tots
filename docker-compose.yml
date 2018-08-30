@@ -1,0 +1,42 @@
+#creating and running multiple comtainers at the same time
+    #in the min project folder create
+    #create docker-compose.yml
+
+#in docker-compose.yml
+  version:'latest version number'
+  services:
+
+    <name of docker image>:
+      build: <file location of the docker image>
+      volumes:
+        - <src folder>:<destination folder> #files in the src folder(can be folder in image or host system) are copied in to destination folder(can be folder in image or host system)
+        - <src folder2>:<destination folder2>
+        - <src folder3>:<destination folder3>
+      ports:
+        - <port>:<app port> #maps port app is listening(<app port>) to <port>
+      depends_on:
+        - <name of docker image 3>
+
+    <name of docker image2>:
+      image: <image name from dockerhub> #use only during dev use build during production  #volumes list is a must when using image
+      build: <file location of the docker image>
+      volumes:
+        - <src folder>:<destination folder> #files in the src folder(can be folder in image or host system) are copied in to destination folder(can be folder in image or host system)
+        - <src folder2>:<destination folder2>
+        - <src folder3>:<destination folder3>
+      ports:
+        - <port>:<app port> #maps port app is listening(<app port>) to <port>
+      depends_on:
+        - <name of docker image>
+
+<---------connecting containers-------->
+#------data can be transefered from one comtainer to the other if the file is present in the services list in docker-compose.yml by sending http req 
+http://<name of docer image>
+
+
+        
+#<-------starting/stoping docker compose------>
+#in the project folder which has docker-compose.yml file
+        docker-compose up -d [-d is not a must] #-d for detached mode containes run in the background 
+        docker-compose stop
+
