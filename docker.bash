@@ -4,10 +4,12 @@ https://www.katacoda.com/learn?q=&hPP=12&idx=scenarios&p=0&is_v=1
 install docker
 
 #basic commands
-    docker run -d|-it -p <port:no> --name <image name|alias name> <repo/image name> #runs a container 
+    docker run -d|-it -p <port:no> --name <container name|alias name> <repo|image name>:<version> #runs a container 
     #-p is used when a web app needs to be opened in the browser
     #-d starts container in detached mode use docker attach <image name> to use containers terminal
     #-it starts a container in the foreground and starts and interactive shell terminal
+    docker run -it <image name> <command to run after container is created> 
+    
     docker start <name/id> #starts a container which is not running
                            #used to restart a container whose image is already created (ie after docker run is executed)
     docker stop <name/id> #shut down
@@ -34,7 +36,7 @@ install docker
     #create the needed config file if any such as nginx webpack etc
 
     FROM <IMAGE NAME>
-
+    COPY <folder|file location in dev machine> <location in the docker container>    
     RUN <terminal commands> #to create a file/folder 
     ADD  #add/change file to existing folder or directories no terminal commands 
         #eg to change file ./nginx.conf() <space> /etc/nginx/conf.d/default.conf -> changes default.cong with nginx.conf
@@ -52,13 +54,15 @@ install docker
 
 #in the previously opened terminal window
 #not needed if image is being pulledd from docker hub 
-    docker build -t <repo/image name> <docker image location | . >
+    docker build -t <repo|image name> <docker image location | . >
     <or>
     docker build -t <image name>:<version> <docker image location | . > # . => current dir
     #-t (tag) allows to specify a name for the image
+    
     #-name is different form -t 
         #--name is used to give name for a container newly created 
         #-t is used for naminig images
+        
     #then --->
     #if images is pulled from docker hub directly run this
         docker run -d -p <host port:container port> --name <container name|alias name> <repo/image name to be used>
@@ -66,6 +70,7 @@ install docker
     #adding volumes [only during dev remove before deployment]
     #<-----copies the edited project file to the container file and restarts the docker container---->
         docker run -p <host port:container port> -v <project folder full location> (src folder) : <file to be copied into the docker file>(destination folder) <repo/image name>
+            #use $PWD for getting location of the current working directory in the dev machine
             #eg-> <project folder full location> : D:/project/myapp 
                  #<file to be copied into in the docker file> : /var/www/html <-folder in docker container
 
@@ -97,8 +102,10 @@ install docker
     ONBUILD RUN npm install
     ONBUILD COPY . /usr/src/app
     CMD [ "npm", "start" ]
-    ENTRYPOINT["executable commands"]
     #or
+    ENTRYPOINT["executable commands"]
+   
+   
 
     FROM node:7-onbuild
     EXPOSE 3000
@@ -183,9 +190,20 @@ docker import <file name>.tar
     #docker volume allow directories to be shared between containers
     #it allows for use of of db and for large file 
     #docker vloumes allow for resatrting and sharing data between containers without lossing data
+    #if the container is deleted the data stored in the volume is still present 
+    
         docker run -v  <folder to save in docker location> :<src folder location> --name <container alias> -d <image name> 
         docker run -v $(pwd)|<local file loction> : <docker container file location> --name <container name> -d <image name> -p <host sys port>:<port in container>
-
+    
+    #creating a volume in local machine to map with container
+        docker volume create <volume name>
+    #to list the volumes created 
+        docker volume ls
+    #to inspect the volumes created
+        docker volume inspect <volume name> 
+       
+    #running the docker container with the volume
+        docker run -name <container name> -v <Volume name>:<location in docker containerr> -p <container port>:<host port> <image name>
 
     #to make to file read only
         docker run -v <folder to save in docker location> :<src folder location>:ro -it<image name>
@@ -196,3 +214,27 @@ docker import <file name>.tar
     #<----volume from------>
     #after creating a volume
         docker run --volumes-from <container alias from above> -it <image name to use>
+        
+        
+  #<----reducing size of docker container----->
+  
+  # 1. changing the version of base image
+    #in the dockerfile
+        #while importing using "FROM" 
+            FROM <base image>:<version> #instead of giving version number use alpine
+            FROM <base image>:alpine #reduces size by 50%
+            
+   # 2. by tagging the container and making a new container
+    #after importing the base image
+        FROM <base image>:alpine AS <tag name>
+        #in the same dockerfile after seting the woking dir
+        FROM alpine
+        WORKDIR <workdir name>
+        COPY --from=<tag name> <previous docker image's files that need to be copied such as the working dir> <working dir| distination location of the new container>
+        write the rest of the dockerfile
+        
+        
+    
+    
+    
+    
