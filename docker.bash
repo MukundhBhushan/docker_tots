@@ -3,20 +3,50 @@ https://www.katacoda.com/learn?q=&hPP=12&idx=scenarios&p=0&is_v=1
 
 install docker
 
+#new convention use container managment etc before the actual command
+#for more of the keywords type docker in the terminal
 #basic commands
-    docker run -d|-it -p <port:no> --name <container name|alias name> <repo|image name>:<version> #runs a container 
-    #-p is used when a web app needs to be opened in the browser
-    #-d starts container in detached mode use docker attach <image name> to use containers terminal
-    #-it starts a container in the foreground and starts and interactive shell terminal
-    docker run -it <image name> <command to run after container is created> 
+    docker run | container run -d | -it -p <port on machine : port on container> --name <container name|alias name> <repo|image name>:<version> #runs a container 
+    #-p (publish)is used when a web app needs to be opened in the browser
+    #-d(detached) starts container in detached mode use docker attach <image name> to use containers terminal
+    #-it (interactive) starts a container in the foreground and starts and interactive shell terminal
+    docker run | container run -it <image name> <command to run after container is created> 
     
-    docker start <name/id> #starts a container which is not running
+    docker start | container start <name/id> #starts a container which is not running
                            #used to restart a container whose image is already created (ie after docker run is executed)
-    docker stop <name/id> #shut down
+    docker stop | container stop<name/id> #shut down
     docker ps -a #-a to list stoped containers too
+    docker container ls #same as docker ps
     docker images #all the images being used
-    docker rm <name/id> #removes the image
+    docker rm | conainer rm <name/id> #removes the image. does not remove a runnig container
+    docker rm | conainer rm <name|id> -f #remove contaner even if it is running
+    docker top <continer name> #lists the running process in an container 
+    docker stats 
+    docker container inspect <container name> 
 
+#finding size of docker image
+    docker images 
+    docker images | grep <image name>
+#to set env variables
+    docker run | container run -d | -it -p <port:no> --name <container name|alias name> <repo|image name>:<version> --env | -e 
+
+#starting a container which is stopped
+    docker container start -ai <container name>
+        #-ai for interactive mode use if docker container was created with -it flag
+    docker container start <container name>
+        #starts container in detatched mode
+
+#executing a command in the container bash immedialty after the container is created
+    docker container run -it --name <conatiner name> <image name> <terminal command>
+    #if u want to access bash
+        <terminal command> = bash
+    #if using alpine instead of ubuntu
+        <terminal command> = sh 
+    
+
+#<----bashing into container---->
+#it can also be used to use bash with the a detached container
+    docker exec -it <container name|alias>
 
 #<------connecting to container----->
 #copy ip address
@@ -91,6 +121,25 @@ install docker
     docker inspect <given-name|container-id>
     docker log <given-name|container-id>
 
+#docker network
+    docker network ls #list all the network related info in all the existing containers
+    docker network inspect <NAME> #NAME is a coloumn found after running docker network ls
+
+#for containers with NAME = none 3rd party extensions which provide virtual network features can be given
+    docker network create <network name>
+
+#creating docker container with a network option
+    docker container run -d --name <container name> --network <network name> <image name>
+        #<network name> must be filled once the docker network create command is run
+#connecting an existing container without a network parameter
+    docker network connect <network name> <conainer name to connect>
+
+#container network inspecting
+    docker network inspect <container name>
+
+#disconnecting from network
+    docker network disconnect<network name> <conainer name to connect> 
+
 
 
 #<---OnBuild--->
@@ -141,9 +190,6 @@ echo <file name to be ignored> >> .dockerignore
         #to output the contents stored
             KEYS *
 
-#<----bashing into container---->
-    docker exec -it <container name|alias>
-
 
 #<-------linking containers WITH NETWORK------->
     #to create a network
@@ -156,7 +202,7 @@ echo <file name to be ignored> >> .dockerignore
     
     #networks do not define any envronment vars
     #running terminal commands in containers
-        docker run --net = <network name> <container name> <command>
+        docker  run --net = <network name> <container name> <command>
     #connect to app
     docker run -d -p <container port>:<host port> --net=<network name to connect> <profect file location>
 
