@@ -3,19 +3,29 @@
     #create docker-compose.yml
 
 #in docker-compose.yml
-  version:'latest version number'
+  version: 'latest version number'
   services:
-
-    <name of docker image>:
-      build: <file location of the docker image>
+    <service name>: #sevice name has to be same as docker image name
+      build: 
+        context: .| <file location of the docker image>
+        dockerfile: <name of docker file> #use this if docker file name is not "dockerfile" ie if u gave ur own name to ur dockerfile
       volumes:
         - <src folder>:<destination folder> #files in the src folder(can be folder in image or host system) are copied in to destination folder(can be folder in image or host system)
-        - <src folder2>:<destination folder2>
+        - <src folder2>:<destination folder2> # docker compose understands '.' as current working directory $(pwd) is not needed
         - <src folder3>:<destination folder3>
+      
+      image:
+        <docker image name> #this name will be given to the custom docker file being used and not from dockerhub
+        
+      command: 
+        <command line instruction>
+      environment: #used for storing environment variables
+        <key>:<value> 
       ports:
         - <port>:<app port> #maps port app is listening(<app port>) to <port>
       depends_on:
-        - <name of docker image 3>
+        - <service name it depends on> #ie this container needs/ depends on the <service x> to work fine
+      
 
     <name of docker image2>:
       image: <image name from dockerhub> #use only during dev use build during production  #volumes list is a must when using image

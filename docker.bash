@@ -120,7 +120,7 @@ install docker
 #to get more details of the docker container
     docker inspect <given-name|container-id>
     docker log <given-name|container-id>
-
+    docker log <given-name|container-id>
 #docker network
     docker network ls #list all the network related info in all the existing containers
     docker network inspect <NAME> #NAME is a coloumn found after running docker network ls
@@ -249,8 +249,9 @@ docker import <file name>.tar
         docker volume inspect <volume name> 
        
     #running the docker container with the volume
+        #named volume and setting location of db in container
         docker run -name <container name> -v <Volume name>:<location in docker containerr> -p <container port>:<host port> <image name>
-
+        
     #to make to file read only
         docker run -v <folder to save in docker location> :<src folder location>:ro -it<image name>
 
@@ -260,8 +261,20 @@ docker import <file name>.tar
     #<----volume from------>
     #after creating a volume
         docker run --volumes-from <container alias from above> -it <image name to use>
-        
-        
+    
+    #<----cleanup data volumes----->
+        docker volume prune
+    #<----removing a data volume---->
+        docker volume rm <name of volume>
+
+    #<-----bind mounting----->
+    #helps docker to use local files on machine on the container
+        docker run -d --name <container name> -p <port on local machine>:<port on container> -v <location of file on local machine>:<destination folder on container> <image name>
+        #use $(pwd) in place of file on local machine location
+        #eg:
+            docker container run -d --name my_nginx $(pwd):/usr/share/nginx/html nginx
+
+
   #<----reducing size of docker container----->
   
   # 1. changing the version of base image
