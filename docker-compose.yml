@@ -1,22 +1,25 @@
 #creating and running multiple comtainers at the same time
-    #in the min project folder create
+    #in the main project folder create
     #create docker-compose.yml
 
 #in docker-compose.yml
   version: 'latest version number'
   services:
-    <service name>: #sevice name has to be same as docker image name
-      build: 
-        context: .| <file location of the docker image>
+    <service name>: #sevice name 
+      image: #searches in dockerhub
+        <docker image name> #this name will be given to the custom docker file being used and not from dockerhub
+        
+      build: #to build images with own dockerfile 
+        context: .| <file location of working dir>
         dockerfile: <name of docker file> #use this if docker file name is not "dockerfile" ie if u gave ur own name to ur dockerfile
+      restart: "always"| "no" | "on-failure" | "unless-stopped"
       volumes:
+        - <folder location in docker file> #contents in the folder are overwritten if part of other folders otherwise not mounted
         - <src folder>:<destination folder> #files in the src folder(can be folder in image or host system) are copied in to destination folder(can be folder in image or host system)
         - <src folder2>:<destination folder2> # docker compose understands '.' as current working directory $(pwd) is not needed
         - <src folder3>:<destination folder3>
+      # - is used to define arrays in yml
       
-      image:
-        <docker image name> #this name will be given to the custom docker file being used and not from dockerhub
-        
       command: 
         <command line instruction>
       environment: #used for storing environment variables
@@ -29,7 +32,7 @@
 
     <name of docker image2>:
       image: <image name from dockerhub> #use only during dev use build during production  #volumes list is a must when using image
-      build: <file location of the docker image>
+      build: <file location of the docker image> #to be used for building cusom docker images
       volumes:
         - <src folder>:<destination folder> #files in the src folder(can be folder in image or host system) are copied in to destination folder(can be folder in image or host system)
         - <src folder2>:<destination folder2>
@@ -39,14 +42,24 @@
       depends_on:
         - <name of docker image>
 
-<---------connecting containers-------->
+
+#restarting automatically (Restart policy)
+"no" : never
+"always": restart always
+"on-failure": error in code and container crash
+"unless-stopped": always restart until forcebly stopped
+#<---------connecting containers-------->
 #------data can be transefered from one comtainer to the other if the file is present in the services list in docker-compose.yml by sending http req 
-http://<name of docer image>
+#http://<name of docer image>
 
 
         
 #<-------starting/stoping docker compose------>
 #in the project folder which has docker-compose.yml file
-        docker-compose up -d [-d is not a must] #-d for detached mode containes run in the background 
-        docker-compose stop
+docker-compose up -d [-d is not a must] #-d for detached mode containes run in the background 
+docker-compose stop
+docker-compose down
+docker-compose up == docker container run <image name>
+
+docker-compose up --build == docker container build <image location> docker container run <image name>  
 

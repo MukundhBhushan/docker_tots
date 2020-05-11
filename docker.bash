@@ -46,7 +46,7 @@ install docker
 
 #<----bashing into container---->
 #it can also be used to use bash with the a detached container
-    docker exec -it <container name|alias>
+    docker exec -it <container name|alias> bash|sh
 
 #<------connecting to container----->
 #copy ip address
@@ -92,10 +92,10 @@ install docker
     #-name is different form -t 
         #--name is used to give name for a container newly created 
         #-t is used for naminig images
-        
+
     #then --->
     #if images is pulled from docker hub directly run this
-        docker run -d -p <host port:container port> --name <container name|alias name> <repo/image name to be used>
+        docker run -d -p <host port:container port> --name <container name|alias name> <repo|image name to be used>
 
     #adding volumes [only during dev remove before deployment]
     #<-----copies the edited project file to the container file and restarts the docker container---->
@@ -113,14 +113,16 @@ install docker
     #to set env for Node
         docker run -d --name <container name> -e NODE_ENV=production -p <host port>:<container port> <image name>
 
-        
+    #if the file name is other than Dockerfile
+        docker image build -f <custom docker file name> . 
+
 #to access the containers terminal
     docker attach <image name>
 
 #to get more details of the docker container
     docker inspect <given-name|container-id>
-    docker log <given-name|container-id>
-    docker log <given-name|container-id>
+    docker logs <given-name|container-id>
+    #docker log <given-name|container-id>
 #docker network
     docker network ls #list all the network related info in all the existing containers
     docker network inspect <NAME> #NAME is a coloumn found after running docker network ls
@@ -241,6 +243,10 @@ docker import <file name>.tar
         docker run -v  <folder to save in docker location> :<src folder location> --name <container alias> -d <image name> 
         docker run -v $(pwd)|<local file loction> : <docker container file location> --name <container name> -d <image name> -p <host sys port>:<port in container>
     
+        #settingup volumes with missing folders
+        # if the nodemodules folder is deleted in the local machine
+        docker container -v <folder path in container> -v <folder path local machine>:<folder path container>
+    #first -v has no : as it is not refering to an file
     #creating a volume in local machine to map with container
         docker volume create <volume name>
     #to list the volumes created 
